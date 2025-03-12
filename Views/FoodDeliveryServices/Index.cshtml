@@ -1,0 +1,51 @@
+﻿@model Lab5.Models.ViewModels.DealsViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Food Delivery Services</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.FoodDeliveryServices.First().Title)</th>
+            <th>@Html.DisplayNameFor(model => model.FoodDeliveryServices.First().Fee)</th>
+            <th>Subscribed Customers</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var service in Model.FoodDeliveryServices)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => service.Title)</td>
+                <td>@Html.DisplayFor(modelItem => service.Fee)</td>
+                <td>
+                    @if (service.Subscriptions.Any())
+                    {
+                        <ul>
+                            @foreach (var sub in service.Subscriptions)
+                            {
+                                <li>@sub.Customer.FullName</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span>No customers subscribed</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@service.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@service.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@service.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

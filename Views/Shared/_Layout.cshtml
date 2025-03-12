@@ -1,0 +1,17 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    @Html.ActionLink("Home", "Index", "Home") <br />
+    @Html.ActionLink("Customers", "Index", "Customers")<br/>
+    @Html.ActionLink("Food Delivery Services", "Index", "FoodDeliveryServices")<br/>
+</head>
+<body>
+    <div>
+        @RenderBody()
+    </div
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
