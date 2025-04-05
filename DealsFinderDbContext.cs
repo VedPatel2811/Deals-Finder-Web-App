@@ -19,6 +19,7 @@ namespace Lab5
 
             modelBuilder.Entity<Subscription>()
                 .HasKey(b => new { b.CustomerId, b.ServiceId });
+                
         }
     }
 }
