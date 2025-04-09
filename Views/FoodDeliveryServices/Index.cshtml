@@ -4,10 +4,77 @@
     ViewData["Title"] = "Index";
 }
 
+<style>
+    /* Main table styling */
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+        .table th {
+            background-color: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: top;
+        }
+
+    /* Action links styling */
+    .btn-link {
+        color: #007bff;
+        text-decoration: none;
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+    }
+
+        .btn-link:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+    /* Customer list styling */
+    .customer-list {
+        background-color: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        margin-top: 5px;
+    }
+
+        .customer-list span {
+            display: inline-block;
+            margin-right: 10px;
+            padding: 3px 8px;
+            background-color: #e9ecef;
+            border-radius: 3px;
+            margin-bottom: 5px;
+        }
+
+    /* Action separator */
+    .action-separator {
+        color: #6c757d;
+        padding: 0 5px;
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .table th, .table td {
+            padding: 8px;
+        }
+    }
+</style>
+
 <h1>Food Delivery Services</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
 </p>
 
 <table class="table">
@@ -15,7 +82,7 @@
         <tr>
             <th>@Html.DisplayNameFor(model => model.FoodDeliveryServices.First().Title)</th>
             <th>@Html.DisplayNameFor(model => model.FoodDeliveryServices.First().Fee)</th>
-            <th>Subscribed Customers</th>
+            <th>Subscribers' Name</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -26,26 +93,53 @@
                 <td>@Html.DisplayFor(modelItem => service.Title)</td>
                 <td>@Html.DisplayFor(modelItem => service.Fee)</td>
                 <td>
-                    @if (service.Subscriptions.Any())
-                    {
-                        <ul>
+                    <div id="customers-@service.Id" class="customer-list" style="display: none;">
+                        @if (service.Subscriptions.Any())
+                        {
                             @foreach (var sub in service.Subscriptions)
                             {
-                                <li>@sub.Customer.FullName</li>
+                                <span>@sub.Customer.FullName</span>
                             }
-                        </ul>
-                    }
-                    else
-                    {
-                        <span>No customers subscribed</span>
-                    }
+                        }
+                        else
+                        {
+                            <span>No customers subscribed</span>
+                        }
+                    </div>
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@service.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@service.Id">Details</a> |
+                    <button class="btn btn-link toggle-customers" data-service-id="@service.Id">Select</button>
+                    <span class="action-separator">|</span>
+                    <a asp-action="Edit" asp-route-id="@service.Id">Edit</a>
+                    <span class="action-separator">|</span>
+                    <a asp-action="Details" asp-route-id="@service.Id">Details</a>
+                    <span class="action-separator">|</span>
                     <a asp-action="Delete" asp-route-id="@service.Id">Delete</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleButtons = document.querySelectorAll('.toggle-customers');
+
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const serviceId = this.getAttribute('data-service-id');
+                    const customersDiv = document.getElementById(`customers-${serviceId}`);
+
+                    if (customersDiv.style.display === 'none') {
+                        customersDiv.style.display = 'block';
+                        this.textContent = 'Hide';
+                    } else {
+                        customersDiv.style.display = 'none';
+                        this.textContent = 'Select';
+                    }
+                });
+            });
+        });
+    </script>
+}
