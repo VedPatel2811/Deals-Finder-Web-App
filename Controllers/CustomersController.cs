@@ -21,10 +21,46 @@ namespace Lab5.Controllers
         }
 
         // GET: Customers
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? id)
         {
-          
-            return View(await _context.Customers.ToListAsync());
+            // Get all customers first
+            var allCustomers = await _context.Customers.ToListAsync();
+            ViewBag.AllCustomers = allCustomers;
+
+            // If no ID is selected, return empty view model
+            if (id == null)
+            {
+                return View(new CustomerSubscriptionViewModel());
+            }
+
+            // Get the selected customer
+            var customer = await _context.Customers
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (customer == null)
+            {
+                return NotFound();
+            }
+
+            // Get subscriptions for the customer
+            var subscriptions = await _context.Subscriptions
+                .Where(s => s.CustomerId == id)
+                .Include(s => s.FoodDeliveryService)
+                .Select(s => new FoodDeliveryServiceSubscriptionViewModel
+                {
+                    FoodDeliveryServiceId = s.ServiceId,
+                    Title = s.FoodDeliveryService.Title,
+                    IsSubscribed = true
+                })
+                .ToListAsync();
+
+            var viewModel = new CustomerSubscriptionViewModel
+            {
+                Customer = customer,
+                Subscriptions = subscriptions
+            };
+
+            return View(viewModel);
         }
 
         // GET: Customers/Details/5

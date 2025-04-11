@@ -2,8 +2,8 @@
 {
 	public class CustomerSubscriptionViewModel
 	{
-		public Customer Customer { get; set; }
-		public IEnumerable<FoodDeliveryServiceSubscriptionViewModel> Subscriptions { get; set; }
+        public Customer Customer { get; set; }
+        public IEnumerable<FoodDeliveryServiceSubscriptionViewModel> Subscriptions { get; set; }
 
-	}
+    }
 }
