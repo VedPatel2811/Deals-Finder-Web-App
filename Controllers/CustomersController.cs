@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Lab5;
 using Lab5.Models;
+using Lab5.Models.ViewModels;
 
 namespace Lab5.Controllers
 {
@@ -20,9 +21,34 @@ namespace Lab5.Controllers
         }
 
         // GET: Customers
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? id)
         {
-            return View(await _context.Customers.ToListAsync());
+            var customers = await _context.Customers.ToListAsync();
+            if (id != 0)
+            {
+                ViewData["customerID"] = id;
+
+
+                var subscriptions = await _context.Subscriptions
+                    .Include(s => s.Customer)
+                    .Include(s => s.FoodDeliveryService)
+                    .ToListAsync();
+
+                var viewModel = new CustomerSubscriptionsViewModel
+                {
+                    Customers = customers,
+                    Subscriptions = subscriptions
+                };
+
+                return View(viewModel);
+
+            }
+            var customerViewModel = new CustomerSubscriptionsViewModel
+            {
+                Customers = customers
+            };
+
+            return View(customerViewModel);
         }
 
         // GET: Customers/Details/5

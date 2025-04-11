@@ -82,7 +82,6 @@
         <tr>
             <th>@Html.DisplayNameFor(model => model.FoodDeliveryServices.First().Title)</th>
             <th>@Html.DisplayNameFor(model => model.FoodDeliveryServices.First().Fee)</th>
-            <th>Subscribers' Name</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -100,7 +99,7 @@
                             {
                                 <span>@sub.Customer.FullName</span>
                             }
-                        }
+                        }   
                         else
                         {
                             <span>No customers subscribed</span>
