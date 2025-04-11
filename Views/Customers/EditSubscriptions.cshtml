@@ -1,0 +1,59 @@
+﻿@model Lab5.Models.ViewModels.CustomerSubscriptionViewModel
+
+@{
+    ViewData["Title"] = "Edit Subscriptions for " + Model.Customer.FullName;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="subscription-management">
+    @foreach (var service in Model.Subscriptions)
+    {
+        <div class="service-item @(service.IsSubscribed ? "subscribed" : "")">
+            <span>@service.Title</span>
+
+            @if (service.IsSubscribed)
+            {
+                <form asp-action="RemoveSubscription" method="post">
+                    <input type="hidden" name="customerId" value="@Model.Customer.Id" />
+                    <input type="hidden" name="foodDeliveryServiceId" value="@service.FoodDeliveryServiceId" />
+                    <button type="submit" class="btn btn-danger">Unregister</button>
+                </form>
+            }
+            else
+            {
+                <form asp-action="AddSubscription" method="post">
+                    <input type="hidden" name="customerId" value="@Model.Customer.Id" />
+                    <input type="hidden" name="foodDeliveryServiceId" value="@service.FoodDeliveryServiceId" />
+                    <button type="submit" class="btn btn-success">Register</button>
+                </form>
+            }
+        </div>
+    }
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+<style>
+    .subscription-management {
+        margin-top: 20px;
+    }
+
+    .service-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+        .service-item.subscribed {
+            background-color: #e8f5e9;
+        }
+
+        .service-item span {
+            flex-grow: 1;
+        }
+</style>
