@@ -108,6 +108,8 @@
                     </div>
                 </td>
                 <td>
+                    <a asp-controller="Deals" asp-action="Index" asp-route-id="@service.Id">Deals</a>
+                    <span class="action-separator">|</span>
                     <button class="btn btn-link toggle-customers" data-service-id="@service.Id">Select</button>
                     <span class="action-separator">|</span>
                     <a asp-action="Edit" asp-route-id="@service.Id">Edit</a>
