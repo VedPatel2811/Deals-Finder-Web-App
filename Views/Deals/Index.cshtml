@@ -1,42 +1,37 @@
-﻿@model IEnumerable<Lab5.Models.Deal>
+﻿@model Lab5.Models.ViewModels.DealsPostsViewModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = $"Deals for {Model.FoodDeliveryService.Title}";
 }
 
-<h1>Index</h1>
+<h1>Deals for @Model.FoodDeliveryService.Title</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
+<table class="table table-bordered">
     <thead>
         <tr>
-        
-            <th>
-                File Name
-            </th>
-            <th>
-                Image
-            </th>
-            <th></th>
+            <th>File Name</th>
+            <th>Image</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
+        @foreach (var item in Model.Deals)
+        {
+            <tr>
+                <td>@item.FileName</td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.FileName)
+                    <img src="@item.Url" alt="Deal Image" style="width: 200px; height: auto;" />
                 </td>
                 <td>
-                    <img src="@item.Url" alt="Prediction Image" class="img-fluid" style="max-width: 160px;" />
+                    <a asp-action="Delete"
+                       asp-route-id="@Model.FoodDeliveryService.Id"
+                       asp-route-fileName="@item.FileName"
+                       class="btn btn-danger">Delete</a>
                 </td>
-            
-            
-            <td>
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+            </tr>
+        }
     </tbody>
 </table>
+
+<a asp-action="Create" asp-route-id="@Model.FoodDeliveryService.Id" class="btn btn-primary">Upload New Deal</a>
+<a asp-action="Index" asp-controller="FoodDeliveryServices" class="btn btn-secondary">Back to List</a>

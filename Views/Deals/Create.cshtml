@@ -1,38 +1,27 @@
 ﻿@model Lab5.Models.ViewModels.FileInputViewModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Upload Deal";
 }
 
-<h1>Create</h1>
+<h1>Upload Deal for: @Model.FoodDeliveryServiceTitle</h1>
 
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form method="post" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<form method="post" enctype="multipart/form-data" asp-action="Create" asp-route-id="@Model.FoodDeliveryServiceId">
+    <input type="hidden" name="FoodDeliveryServiceId" value="@Model.FoodDeliveryServiceId" />
+    <input type="hidden" name="FoodDeliveryServiceTitle" value="@Model.FoodDeliveryServiceTitle" />
 
-            
-
-            <div class="form-group">
-                <span class="text-danger"></span>
-                <label asp-for="File" class="control-label">Upload Image</label>
-                <input asp-for="File" class="form-control" type="file" accept=".jpg,.jpeg,.png" />
-                <span asp-validation-for="File" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <input type="submit" value="Upload" class="btn btn-primary" />
-            </div>
-        </form>
-
+    <div class="form-group">
+        <label asp-for="File" class="control-label">Choose a file:</label>
+        <input asp-for="File" class="form-control" type="file" accept=".jpg,.jpeg,.png" required />
+        <span asp-validation-for="File" class="text-danger"></span>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+    <a asp-action="Index" asp-route-id="@Model.FoodDeliveryServiceId" class="btn btn-secondary">Back to Deals</a>
+</form>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

@@ -1,157 +1,168 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Lab5;
+﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Lab5.Models.ViewModels;
 using Lab5.Models;
+using Lab5.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace Lab5.Controllers
 {
     public class DealsController : Controller
     {
         private readonly DealsFinderDbContext _context;
+        private readonly BlobServiceClient _blobServiceClient;
+        private readonly string _containerName = "deals";
 
-        public DealsController(DealsFinderDbContext context)
+        public DealsController(DealsFinderDbContext context, BlobServiceClient blobServiceClient)
         {
             _context = context;
+            _blobServiceClient = blobServiceClient;
         }
 
-        // GET: Deals
-        public async Task<IActionResult> Index()
+        // GET: Deals/Index/{id}
+        [HttpGet]
+        public async Task<IActionResult> Index(string id)
         {
-            return View(await _context.Deals.ToListAsync());
-        }
+            await EnsureContainerExistsAsync();
 
-        // GET: Deals/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
+            var service = await _context.FoodDeliveryServices.FindAsync(id);
+            if (service == null)
             {
                 return NotFound();
             }
 
-            var deal = await _context.Deals
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (deal == null)
+            var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+            var prefix = $"{id}/";
+
+            var deals = new List<Deal>();
+
+            await foreach (var blobItem in containerClient.GetBlobsAsync(prefix: prefix))
+            {
+                var blobClient = containerClient.GetBlobClient(blobItem.Name);
+
+                deals.Add(new Deal
+                {
+                    Id = blobItem.Name.GetHashCode(), // Temporary ID for view purposes
+                    FileName = blobItem.Name.Replace(prefix, ""),
+                    FoodDeliveryServiceId = id,
+                    Url = blobClient.Uri.ToString()
+                });
+            }
+
+            var model = new DealsPostsViewModel
+            {
+                FoodDeliveryService = service,
+                Deals = deals
+            };
+
+            return View(model);
+        }
+
+        // GET: Deals/Create/{id}
+        [HttpGet]
+        public IActionResult Create(string id)
+        {
+            var service = _context.FoodDeliveryServices.Find(id);
+            if (service == null)
             {
                 return NotFound();
             }
 
-            return View(deal);
-        }
+            var model = new FileInputViewModel
+            {
+                FoodDeliveryServiceId = id,
+                FoodDeliveryServiceTitle = service.Title
+            };
 
-        // GET: Deals/Create
-        public IActionResult Create()
-        {
-            return View();
+            return View(model);
         }
 
         // POST: Deals/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FoodDeliveryServiceId,FileName,Url")] Deal deal)
+        public async Task<IActionResult> Create(FileInputViewModel model)
         {
-            if (ModelState.IsValid)
+            if (model.File == null || model.File.Length == 0)
             {
-                _context.Add(deal);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("", "Please upload a valid file.");
+                return View(model);
             }
-            return View(deal);
+
+            var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+            var blobName = $"{model.FoodDeliveryServiceId}/{Guid.NewGuid()}_{model.File.FileName}";
+            var blobClient = containerClient.GetBlobClient(blobName);
+
+            using (var stream = model.File.OpenReadStream())
+            {
+                await blobClient.UploadAsync(stream, new BlobHttpHeaders
+                {
+                    ContentType = model.File.ContentType
+                });
+            }
+
+            // Save to database
+            var deal = new Deal
+            {
+                FoodDeliveryServiceId = model.FoodDeliveryServiceId,
+                FileName = model.File.FileName,
+                Url = blobClient.Uri.ToString()
+            };
+
+            _context.Deals.Add(deal);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index", new { id = model.FoodDeliveryServiceId });
         }
 
-        // GET: Deals/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        [HttpGet]
+        [Route("Deals/Delete/{id}/{fileName}")]
+        public IActionResult Delete(string id, string fileName)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            fileName = WebUtility.UrlDecode(fileName);
+            var service = _context.FoodDeliveryServices.Find(id);
+            if (service == null) return NotFound();
 
-            var deal = await _context.Deals.FindAsync(id);
-            if (deal == null)
+            var model = new FileInputViewModel
             {
-                return NotFound();
-            }
-            return View(deal);
+                FoodDeliveryServiceId = id,
+                FoodDeliveryServiceTitle = service.Title
+            };
+
+            ViewBag.FileName = fileName;
+            return View(model);
         }
 
-        // POST: Deals/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Route("Deals/Delete/{id}/{fileName}")]
+        [ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FoodDeliveryServiceId,FileName,Url")] Deal deal)
+        public async Task<IActionResult> DeleteConfirmed(string id, string fileName)
         {
-            if (id != deal.Id)
-            {
-                return NotFound();
-            }
+            fileName = WebUtility.UrlDecode(fileName);
+            if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(fileName))
+                return BadRequest("Invalid parameters");
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(deal);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!DealExists(deal.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(deal);
-        }
+            var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+            var blobClient = containerClient.GetBlobClient($"{id}/{fileName}");
 
-        // GET: Deals/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
+            await blobClient.DeleteIfExistsAsync();
             var deal = await _context.Deals
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (deal == null)
-            {
-                return NotFound();
-            }
-
-            return View(deal);
-        }
-
-        // POST: Deals/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var deal = await _context.Deals.FindAsync(id);
+                .FirstOrDefaultAsync(d => d.FoodDeliveryServiceId == id && d.FileName == fileName);
             if (deal != null)
             {
                 _context.Deals.Remove(deal);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", new { id });
         }
 
-        private bool DealExists(int id)
+        private async Task EnsureContainerExistsAsync()
         {
-            return _context.Deals.Any(e => e.Id == id);
+            var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+            await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
         }
     }
 }

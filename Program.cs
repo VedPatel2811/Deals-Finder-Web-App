@@ -1,3 +1,4 @@
+using Azure.Storage.Blobs;
 using Lab5.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,10 @@ namespace Lab5
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             var connection = builder.Configuration.GetConnectionString("DefaultConnection");
+
+            var blobConnection = builder.Configuration.GetConnectionString("AzureBlobStorage");
+            builder.Services.AddSingleton(new BlobServiceClient(blobConnection));
+
             builder.Services.AddDbContext<DealsFinderDbContext>(options => options.UseSqlServer(connection));
             builder.Services.AddSession();
             var app = builder.Build();
@@ -43,8 +48,15 @@ namespace Lab5
             app.UseSession();
 
             app.MapControllerRoute(
+    name: "deleteDeal",
+    pattern: "Deals/Delete/{id}/{fileName}",
+    defaults: new { controller = "Deals", action = "DeleteConfirmed" });
+
+            app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
 
             app.Run();
         }
