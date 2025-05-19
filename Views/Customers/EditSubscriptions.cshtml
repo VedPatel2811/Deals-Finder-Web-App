@@ -37,23 +37,110 @@
 </div>
 
 <style>
+    /* Container for subscription management block */
     .subscription-management {
-        margin-top: 20px;
+        margin-top: 30px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        background-color: #ffffff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
     }
 
+    /* Each row representing a service */
     .service-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 10px;
-        border-bottom: 1px solid #eee;
+        padding: 15px 20px;
+        border-bottom: 1px solid #dee2e6;
+        transition: background-color 0.2s ease;
     }
 
-        .service-item.subscribed {
-            background-color: #e8f5e9;
+        /* Remove border from last item */
+        .service-item:last-child {
+            border-bottom: none;
         }
 
+        /* Highlight subscribed services */
+        .service-item.subscribed {
+            background-color: #e9f7ef;
+        }
+
+        /* Subtle hover effect */
+        .service-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Service title */
         .service-item span {
+            font-size: 16px;
+            font-weight: 500;
+            color: #343a40;
             flex-grow: 1;
         }
+
+    /* Button styles */
+    form {
+        margin: 0;
+    }
+
+    .btn {
+        padding: 6px 14px;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s ease;
+        color: #fff;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+    }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+    .btn-danger {
+        background-color: #dc3545;
+    }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+    /* Link back to list */
+    a {
+        display: inline-block;
+        margin-top: 25px;
+        color: #007bff;
+        text-decoration: none;
+        font-size: 15px;
+    }
+
+        a:hover {
+            text-decoration: underline;
+            color: #0056b3;
+        }
+
+    @@media (max-width: 768px) {
+        .service-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+            .service-item span {
+                font-size: 15px;
+            }
+
+        .btn {
+            font-size: 13px;
+            padding: 6px 12px;
+        }
+    }
 </style>
+

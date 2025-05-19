@@ -6,7 +6,7 @@
 
 <h1>Details</h1>
 
-<div>
+<div class="details-container">
     <h4>FoodDeliveryService</h4>
     <hr />
     <dl class="row">
@@ -28,3 +28,69 @@
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+
+<style>
+    h1, h4 {
+        margin-bottom: 20px;
+        font-weight: 600;
+        color: #343a40;
+    }
+
+    .details-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 25px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .row dl {
+        margin-bottom: 0;
+    }
+
+    dt {
+        font-weight: 500;
+        color: #6c757d;
+        padding-top: 8px;
+    }
+
+    dd {
+        margin-bottom: 16px;
+        padding-top: 8px;
+        font-weight: 400;
+        color: #212529;
+    }
+
+    a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 500;
+        margin-right: 10px;
+    }
+
+        a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+    /* Responsive */
+    @@media (max-width: 576px) {
+        .details-container {
+            padding: 15px;
+        }
+
+        dt, dd {
+            display: block;
+            width: 100%;
+        }
+
+        dt {
+            margin-bottom: 4px;
+        }
+
+        dd {
+            margin-bottom: 12px;
+        }
+    }
+</style>

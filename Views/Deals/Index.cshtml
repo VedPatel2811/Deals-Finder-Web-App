@@ -35,3 +35,88 @@
 
 <a asp-action="Create" asp-route-id="@Model.FoodDeliveryService.Id" class="btn btn-primary">Upload New Deal</a>
 <a asp-action="Index" asp-controller="FoodDeliveryServices" class="btn btn-secondary">Back to List</a>
+
+<style>
+    /* Table styling */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+        font-family: Arial, sans-serif;
+    }
+
+    thead th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+        padding: 12px 15px;
+        border: 1px solid #dee2e6;
+        text-align: left;
+        color: #212529;
+    }
+
+    tbody td {
+        padding: 12px 15px;
+        border: 1px solid #dee2e6;
+        vertical-align: middle;
+    }
+
+    /* Image styling */
+    img {
+        max-width: 200px;
+        height: auto;
+        border-radius: 4px;
+    }
+
+    /* Buttons spacing */
+    a.btn {
+        margin-right: 10px;
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 576px) {
+        table, thead, tbody, th, td, tr {
+            display: block;
+            width: 100%;
+        }
+
+            thead tr {
+                display: none; /* Hide header row */
+            }
+
+        tr {
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 6px;
+            background-color: #fafafa;
+        }
+
+        tbody td {
+            border: none;
+            padding-left: 50%;
+            position: relative;
+            text-align: left;
+        }
+
+            tbody td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 15px;
+                top: 12px;
+                font-weight: bold;
+                white-space: nowrap;
+            }
+
+        img {
+            max-width: 100%;
+            margin-top: 10px;
+        }
+
+        a.btn {
+            display: block;
+            margin: 10px 0 0 0;
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>

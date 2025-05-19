@@ -1,15 +1,48 @@
 ﻿<!DOCTYPE html>
-
 <html>
 <head>
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@ViewBag.Title</title>
-    @Html.ActionLink("Home", "Index", "Home") <br />
-    @Html.ActionLink("Customers", "Index", "Customers")<br/>
-    @Html.ActionLink("Food Delivery Services", "Index", "FoodDeliveryServices")<br/>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
+        nav {
+            background-color: #343a40;
+            padding: 1em;
+            display: flex;
+            gap: 1.5em;
+        }
+
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #ffc107;
+        }
+
+        .content {
+            padding: 2em;
+        }
+    </style>
 </head>
 <body>
-    <div>
+    <nav>
+        @Html.ActionLink("Home", "Index", "Home")
+        @Html.ActionLink("Customers", "Index", "Customers")
+        @Html.ActionLink("Food Delivery Services", "Index", "FoodDeliveryServices")
+    </nav>
+
+    <div class="content">
         @RenderBody()
         @RenderSection("Scripts", required: false)
     </div>
